@@ -1,20 +1,19 @@
 /////////////// Trouver une forme //////////////
 const fs = require('fs');
-const colors = require('colors');
 
 
 
 
 // Functions: 
 
-function searchShape(boardArray, shapeArray, yAxe){
+function searchShape(boardArray, shapeArray, yAxis){
 
     let gapRight = (boardArray[0].length - maxLineLength(shapeArray));
     let firstShapeChar = shapeArray[0].trim().charAt(0);
     let result = null;
-    let axes = {
+    let axis = {
         x: 0,
-        y: yAxe
+        y: yAxis
     }
 
     // Ici on compare horizontalement les différentes lignes (gauche à droite)
@@ -39,8 +38,8 @@ function searchShape(boardArray, shapeArray, yAxe){
                     if(g == gapRight && boardArray.length > shapeArray.length){
                         boardArray.shift();
                         boardArray;
-                        axes.y--;
-                        return searchShape(boardArray, shapeArray, axes.y);
+                        axis.y--;
+                        return searchShape(boardArray, shapeArray, axis.y);
                     
                     // Si tout à été verif mais pas de correspondance    
                     }else if(g == gapRight && boardArray.length === shapeArray.length){
@@ -57,12 +56,12 @@ function searchShape(boardArray, shapeArray, yAxe){
                     
                     // coordonnée x de l'élément le plus haut de la forme
                     if(s === 0 && charS === charB){     
-                        axes.x = g + lineS.indexOf(firstShapeChar); 
+                        axis.x = g + lineS.indexOf(firstShapeChar); 
                     }
 
                     // Si toute la forme à été comparée
                     if(c == lineS.length -1 && s == shapeArray.length -1){
-                        result = `Found! \nCoordinates: ${Object.values(axes)}`;
+                        result = `Found! \nCoordinates: ${Object.values(axis)}`;
                     }
                 }   
             }
@@ -91,32 +90,17 @@ function maxLineLength(model){
     return maxLenth;
 }
 
-// function longestShapeLine(shapeLines){
-
-//     let maxLength = null;
-    
-//     for(z = 0; z < shapeLines.length -1; z++){
-//         let lineLength = shapeLines[z].length;
-//         let nextLineLength = shapeLines[z+1].length;
-
-//         if(lineLength >= nextLineLength){
-//             maxLength = lineLength;
-//         }else{
-//             maxLength = nextLineLength;
-//         }
-//     }
-//     return maxLength;
-// }
-
 
 
 
 // Errors:
 
 function isShapeLowerToBoard(board, shape){
+
     if(board.length >= shape.length){
         let maxBoardLineLen = maxLineLength(board);
         let maxShapeLineLen = maxLineLength(shape);
+        
         if(maxBoardLineLen >= maxShapeLineLen){
             return true;
         }else{
@@ -135,13 +119,14 @@ function isShapeLowerToBoard(board, shape){
 const path = process.argv;
 let inputBoard = (fs.existsSync(path[2]) ? fs.readFileSync(`./${path[2]}`, 'utf8').split('\n') : false);
 let inputShape = (fs.existsSync(path[3]) ? fs.readFileSync(`./${path[3]}`, 'utf8').split('\n') : false);
-let yAxeInput = inputBoard.length -1;
+let yAxisInput = inputBoard.length -1;
+
 
 
 
 // Resolve:
 
-let coordinates = (inputBoard && inputShape && isShapeLowerToBoard(inputBoard, inputShape) ? searchShape(inputBoard, inputShape, yAxeInput) : "Error!")
+let coordinates = (inputBoard && inputShape && isShapeLowerToBoard(inputBoard, inputShape) ? searchShape(inputBoard, inputShape, yAxisInput) : "Error!")
 
 
 
