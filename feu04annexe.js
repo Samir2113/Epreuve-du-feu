@@ -4,11 +4,12 @@ fs = require('fs');
 function createBoard(xAxis, yAxis, dens){
     console.log(`${y}.xo`);
     let board = [];
+    
     for(i = 0; i < yAxis; i++){
         let test = "";
+
         for(j = 0; j < xAxis; j++){
             test += ((Math.ceil(Math.random() * (yAxis))) * 2 < dens) ? 'x' : '.';
-            
         }
         board.push(test);
     }
@@ -19,14 +20,24 @@ function createBoard(xAxis, yAxis, dens){
 
 
 function createBoardTxt(boardArray){
+
+    // Suppression de l'ancien plateau:
+    if(fs.existsSync('./plateau')){
+        fs.unlink('./plateau', (err) => {
+            if (err) throw err;
+            console.log('L\'ancien plateau a été supprimé');
+          });
+    }
+    
+    // Création d'un nouveau plateau:
     for(t = 0; t < boardArray.length; t++){
-        
         let line = (t === boardArray.length -1) ? `${boardArray[t]}` : `${boardArray[t]}\n`;
         
         fs.appendFile('plateau', line, (err) => {
             if (err) throw err;
         });
     }
+    console.log('Le plateau a été créé!');
 }
     
 
