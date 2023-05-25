@@ -1,4 +1,4 @@
-/////////////// Mélanger 2 tableaux triés //////////////
+/////////////// Trouver le plus grand carré //////////////
 fs = require('fs');
 
 
