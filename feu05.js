@@ -6,112 +6,99 @@
 
 // Fonction principale de résolution du labyrinthe:
 
-function resolvedLabyrinthe(labyrinthe, currentPos){
-    if(solved(labyrinthe, currentPos)){
-        labyrinthes.push(labyrinthe);
-    }else{
-        let possibleWays = searchValidWays(labyrinthe, currentPos); 
-        console.log(possibleWays);
-        
-        searchForSolutions(possibleWays);
+// 1.Numéroter les cases vides du labyrinthe en fct de leur distance par rapport à l'entré
+
+function getDistanceNbr(maze, coorEnter){
+    
+    maze[coorEnter[0]][coorEnter[1]] = 1;
+    while(!isMazeFull(maze)){
+        for(i = 1; i < maze.length -1; i++){
+            for(j = 1; j < maze[i].length -1; j++){
+                
+                let cell = maze[i][j];
+                let down = [i+1, j];
+                let left = [i, j-1];
+                let right = [i, j+1];
+                let up = [i-1, j];
+                let moves = [down, left, right, up];
+                
+                if(cell != " " && cell != "*"){  
+                    for(m = 0; m < moves.length; m++){
+                        if(maze[moves[m][0]][moves[m][1]] === " "){
+                            maze[moves[m][0]][moves[m][1]] = cell +1;
+                        }
+                    }
+                }
+            }    
+        }
     }
+    counter = maze[end[0]][end[1]];
+    trace(maze, end);
+    clearMaze(maze);
+    return maze;
 }
-///////////////////////////////////////////////////////////////////
 
 
-// Fonction de vérification de labyrinthe résolus:
+// 2.Tracer le parcourt du plus court chemin à partir de la sortie
 
-function solved(lab, curPos){
-    if(lab[curPos[1]][curPos[0]] === "2"){
-        return true;
-    }else{
-        return false;
-    }
-}
-///////////////////////////////////////////////////
-
-
-// Fonction de validation des mouvements (avant, arrière, droite, gauche) et des différents chemins plausibles:
-
-function searchValidWays(laby, position){
-    let result = [];
-    let up = laby[position[1]-1][position[0]];
-    let down = laby[position[1]+1][position[0]];
-    let right = laby[position[1]][position[0]+1];
-    let left = laby[position[1]][position[0]-1];
-
-    let moves = [up, down, right, left];
-    // console.log(`up: ${up}`);
-    // console.log(`down: ${down}`);
-    // console.log(`right: ${right}`);
-    // console.log(`left: ${left}`);
-     
-    for(i = 0; i < moves.length; i++){
-        let newLab = [...laby];
-        let coor = [...position];
-        let newPos = null;
-        let item = [...moves];
-
-        if(item[i] === " " || item[i] === '2'){
+function trace(mazeWithNbrs, currPos){
+    let cell = mazeWithNbrs[currPos[0]][currPos[1]];
+    while(cell !== '1'){
+        let up = [currPos[0]-1, currPos[1]];
+        let left = [currPos[0], currPos[1]-1];
+        let right = [currPos[0], currPos[1]+1];
+        let down = [currPos[0]+1, currPos[1]];    
+        let moves = [up, left, right, down];
             
-            switch(i){
-                case 0: 
-                    newPos = [position[0], position[1]-1];
-                break;
-                case 1: 
-                    newPos = [position[0], position[1]+1];
-                break;
-                case 2: 
-                    newPos = [position[0]+1, position[1]];
-                break;
-                case 3: 
-                    newPos = [position[0]-1, position[1]];
-                break;
+        for(r = 0; r < moves.length; r++){
+            let nextCell = mazeWithNbrs[moves[r][0]][moves[r][1]];
+          
+            if(nextCell === cell -1 || nextCell === '1'){
+                
+                mazeWithNbrs[currPos[0]][currPos[1]] = "o"; 
+                currPos = moves[r];
+                cell = mazeWithNbrs[currPos[0]][currPos[1]];
 
             }
-            newLab[position[1]][position[0]] = 'o';
-            result.push([newLab, newPos]);
-        }   
-    }
-    
-return result;
-}
-/////////////////////////////////////////////////////////////
-
-
-// Fonction de recherche récursive (test):
-
-function searchForSolutions(labs){
-    if(labs.length > 0){
-      
-        for(z = 0; z < labs.length; z++){
-            console.log(`z: ${z}`);
-            resolvedLabyrinthe(labs[z][0], labs[z][1]);
-            // console.log(labs[z][0]);
-            // console.log(labs[z][1]);
         }
     }
 }
-//////////////////////////////////////////////////////
 
+//3.Nettoyer le labyrinthe
+
+function clearMaze(mazeWithNbrs){
+    for(f = 1; f < mazeWithNbrs.length -1; f++){
+        let row = mazeWithNbrs[f];
+       
+        for(g = 1; g < row.length-1; g++){
+            
+            if(row[g] !== "o" && row[g] !== "*"){
+                mazeWithNbrs[f][g] = ' ';
+            } 
+        }
+    }
+}
+
+// 1.5.Verification que toutes les cases soient remplies
+
+function isMazeFull(laby){
+    for(y = 1; y < laby.length -1; y++){
+        if(laby[y].includes(' ')){
+            return false;
+        }
+    }
+    return true;
+}
 
 // Mise en forme du(des) labyrinthe(s):
 
 function arrayToString(tab){
-    let counter = 1;
     for(z = 0; z < tab.length; z++){
-        let arrayLab = tab[z];
-        console.log(`Solution ${counter}:`)
-        arrayLab.map(function(line){
-
-            let row = '';
-            for(c = 0; c < line.length; c++){
-                row += line[c];
-            }
-            console.log(row);
-            ;
-        });
-        counter++
+        let row = '';
+        tab[z].map(item =>{
+            row += item;
+        })
+        console.log(row);        
     }
 }
 /////////////////////////////////////////////
@@ -129,8 +116,8 @@ function arrayToString(tab){
 const myLabyrinthe = [
     ['*', '*', '*', '1', '*', '*', '*', '*'],
     ['*', ' ', ' ', ' ', ' ', ' ', ' ', '*'],
-    ['*', ' ', ' ', ' ', '*', ' ', ' ', '*'],
-    ['*', ' ', '*', ' ', ' ', ' ', ' ', '*'],
+    ['*', ' ', ' ', ' ', ' ', '*', '*', '*'],
+    ['*', ' ', '*', '*', '*', '*', ' ', '*'],
     ['*', ' ', ' ', ' ', ' ', ' ', ' ', '*'],
     ['*', '*', '*', '*', '*', '*', '2', '*']
 ]
@@ -146,24 +133,26 @@ myLabyrinthe.map(it => {
 
 
 // Coordonnées entrée/sortie Labyrinthe test:////////////////////////////////////////
-const start = [myLabyrinthe[0].indexOf("1"), 1]
-    
-const end = [myLabyrinthe[myLabyrinthe.length-1].indexOf("2"), myLabyrinthe.length-1]
+const start = [1, myLabyrinthe[0].indexOf("1")]    
+const end = [myLabyrinthe.length-2, myLabyrinthe[myLabyrinthe.length-1].indexOf("2")]
+let counter = 0;
 /////////////////////////////////////////////////////////////////////////////////////
 
 
 // Tableau censé accueillir les différentes solutions du labyrinthe test:
-let labyrinthes = [];
+let labyrinthe = getDistanceNbr(myLabyrinthe, start);
 
+arrayToString(labyrinthe);
+console.log(`Labyrinthe résolu en ${counter} coups!`);
 
 
 // Resolve:
 
-resolvedLabyrinthe([...myLabyrinthe], [...start]);
+
 
 
 
 // Display:
 
-arrayToString(labyrinthes);
+
 
